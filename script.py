@@ -2,7 +2,7 @@ import serial
 import io
 import mysql.connector
 
-ard = serial.Serial('COM6', 9600, timeout=1)
+ard = serial.Serial('COM3', 9600, timeout=1)
 sio = io.TextIOWrapper(io.BufferedRWPair(ard, ard))
 
 def insert(question, answer):
@@ -50,11 +50,14 @@ def pull():
 
         cursor = db.cursor()
 
-        cursor.execute("SELECT q.question as 'Query', r.answer as 'Answer' from question as q join response as r on r.qid = q.id")
+        cursor.execute("SELECT q.question as 'Question', r.answer as 'Answer', count(r.answer) as 'Num Answer' from question as q join response as r on r.qid = q.id group by q.id, r.answer order by q.id")
         
         results = cursor.fetchall()
+        print(results)    
+
         for i in results:
-            print(i)
+            print (i)
+
     except Exception as e:
         print(e)
 
@@ -68,6 +71,7 @@ while True:
         else:    
             data = [int(i) for i in sio.read().strip().split(':') if i != '']
             for i, v in enumerate(data):
+                print("Pushing: {}".format(v))
                 insert(i+1, v)
                 
     except Exception as e:

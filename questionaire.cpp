@@ -5,6 +5,9 @@ U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_NO_ACK | U8G_I2C_OPT_F
 enum State {
            Start,
            Results,
+           R1,
+           R2,
+           R3,
            FAQ,
            Q1,
            Q2,
@@ -63,6 +66,11 @@ void loop() {
             case Results:
                 resultsConfig();
                 break;
+            // case R1: Unused
+            // case R2:
+            // case R3:
+            //     pollConfig();
+                break;
             case FAQ:
                 faqConfig();
                 break;
@@ -73,7 +81,6 @@ void loop() {
                 break;
             case End:
                 endConfig();
-        
                 // snprintf (buf, BuffSize, "%d", data[0]);
                 // u8g.drawStr(10, 33, buf);
                 // snprintf (buf, BuffSize, "%d", data[1]);
@@ -109,10 +116,12 @@ void startConfig() {
     }
 }
 
-bool didRequest = false;
+bool didRequest = false; // Unused
 void resultsConfig() {
     // punch Python, grab SQL data
-    u8g.drawStr(20,20,"Results");
+    u8g.drawStr(0,20,"Results");
+    u8g.drawStr(0,32,"Unbuilt");
+    u8g.drawStr(0,44,"Check PyTerminal");
     switch(didRequest) {
         case false:
             Serial.println("pull");
@@ -122,7 +131,53 @@ void resultsConfig() {
             break;
     }
     
+    for (int i = 0; i < (sizeof(buttpinclick)/sizeof(buttpinclick[0])); i++) {
+        if ((digitalRead(buttpinclick[i][0]) == LOW) && (buttpinclick[i][1] == 0))  {
+            state = Start;
+            didRequest = false;
+            buttpinclick[i][1] = 1;
+        }
+        if ((digitalRead(buttpinclick[i][0]) == HIGH) && (buttpinclick[i][1] == 1)) {
+            buttpinclick[i][1] = 0;
+        }
+    }
+
+    
+  
 }
+
+// Unbuilt
+// void pollConfig() {
+
+//     for (int i = 0; i < (sizeof(buttpinclick)/sizeof(buttpinclick[0])); i++) {
+//         if ((digitalRead(buttpinclick[i][0]) == LOW) && (buttpinclick[i][1] == 0))  {
+//             switch(state) {
+//                 case R1:
+//                     state = R2;
+//                     break;
+//                 case R2:
+//                     state = R3;
+//                 case R3:
+//                     didRequest = false;
+//                     state = Start;
+//             }
+//             buttpinclick[i][1] = 1;
+//         }
+//         if ((digitalRead(buttpinclick[i][0]) == HIGH) && (buttpinclick[i][1] == 1)) {
+//             buttpinclick[i][1] = 0;
+//         }
+//     }
+
+//     switch(state) {
+//                 case R1:
+//                     Serial.read();
+//                     break;
+//                 case R2:
+//                     break;
+//                 case R3:
+//                     break;
+//             }
+// }
 
 void faqConfig() {
     // Project dialoque
@@ -146,7 +201,6 @@ void faqConfig() {
 void qConfig() {
 
     int clicked = -1;
-
     for (int i = 0; i < (sizeof(buttpinclick)/sizeof(buttpinclick[0])); i++) {
         if ((digitalRead(buttpinclick[i][0]) == LOW) && (buttpinclick[i][1] == 0))  {
             clicked = i;

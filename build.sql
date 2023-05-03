@@ -9,10 +9,8 @@ CREATE TABLE question (
 ) ENGINE = innodb;
 
 CREATE TABLE response (
-    id INT auto_increment NOT NULL,
     qid INT NOT NULL,
     answer INT NOT NULL,
-    PRIMARY KEY (id),
     foreign key (qid) references question(id)
 ) ENGINE = innodb;
 
@@ -20,3 +18,10 @@ INSERT INTO question VALUES
 (1,"Did you like this course?"),
 (2,"Do you understand this project?"),
 (3,"Do you like the INFO Capstone course?");
+
+
+SELECT q.question as 'Query', r.answer as 'Answer', count(r.answer) as 'Num Answer'
+    from question as q
+    join response as r on r.qid = q.id
+group by q.id, r.answer
+order by q.id;
