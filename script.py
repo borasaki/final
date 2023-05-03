@@ -1,9 +1,8 @@
 import serial
 import io
 import mysql.connector
-import mariadb
 
-ard = serial.Serial('COM3', 9600, timeout=1)
+ard = serial.Serial('COM6', 9600, timeout=1)
 sio = io.TextIOWrapper(io.BufferedRWPair(ard, ard))
 
 def insert(question, answer):
@@ -17,7 +16,7 @@ def insert(question, answer):
 
         cursor = db.cursor()
         
-        sql = '''INSERT INTO response (qid, answer) VALUES (%s, '%s')''' % (question, answer)
+        sql = '''INSERT INTO response (qid, answer) VALUES (%s, %s)''' % (question, answer)
         cursor.execute(sql)
         db.commit()
 
